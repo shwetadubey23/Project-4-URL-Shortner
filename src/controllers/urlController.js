@@ -81,22 +81,24 @@ const getUrl = async function(req, res){
      if(!shortId){
         return res.status(400).send({status: false, msg: 'Please enter valid urlCode'})
      }
-     let getData = await urlModel.findOne({urlCode : shortId}).select({longUrl : 1 , _id : 0})
-     if(!getData){
-        return res.send("no url found")
-     }
 
+     // cashing part implemented here in this code 
      
-        let cahcedProfileData = await GET_ASYNC(`${getData.shortUrl}`)
-        if(cahcedProfileData) {
-          res.send(cahcedProfileData)
+        let cashProfileData = await GET_ASYNC(`${shortId}`)
+        if(cashProfileData) {
+          console.log("cache generated for this link")
+          let data = JSON.parse(cashProfileData)
+          res.status(302).redirect(data.longUrl)
         } else {
      let getData = await urlModel.findOne({urlCode : shortId})
-     await SET_ASYNC(`${getData.shortUrl}`, JSON.stringify(getData))
-     return res.status(302).redirect(getData.longUrl)
-        
+      if(!getData){
+       return res.send({status : false , msg :"no url found"})
     }
-
+     await SET_ASYNC(`${getData.urlCode}`, JSON.stringify(getData))
+     return res.status(302).redirect(getData.longUrl)
+     
+     // all cashing part in this part  
+    }
     }catch(err){
       return res.status(500).send({status : false , msg : err.message})
     }
