@@ -118,7 +118,7 @@ const getUrl = async function (req, res) {
       if (!getData) {
         return res.status(404).send({ status: false, msg: "no url found" })
       }
-      await SET_ASYNC(`${getData.urlCode}`, JSON.stringify(getData),"EX", 1000)
+      await SET_ASYNC(`${getData.urlCode}`, JSON.stringify(getData))    //"EX", 1000
       return res.status(302).redirect(getData.longUrl)
 
       // all cashing part in this part  
