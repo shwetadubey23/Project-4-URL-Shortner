@@ -56,7 +56,7 @@ const createUrl = async function(req, res){
          if(urlCheck){
             return res.status(400).send({status: false, msg: 'shortUrl for this longUrl has already been generated'});
          }
-         let generateId = shortId.generate(urlCreate.longUrl)
+         let generateId = shortId.generate().toLowerCase()
          let shortUrl = `http://localhost:3000/${generateId}`
          
         let obj = {}
