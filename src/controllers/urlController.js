@@ -27,19 +27,12 @@ const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
 const createUrl = async function (req, res) {
   try {
     let urlCreate = req.body;
-    if (Object.keys(urlCreate).length == 0) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "Request body can not be empty" });
-    }
+   
     if (!urlCreate.longUrl) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "Please enter longUrl Key" });
+      return res.status(400).send({ status: false, msg: "Please enter longUrl Key" });
     }
     let correctLink = false;
-    await axios
-      .get(urlCreate.longUrl)
+    await axios.get(urlCreate.longUrl)
       .then((res) => {
         correctLink = true;
       })
@@ -48,13 +41,9 @@ const createUrl = async function (req, res) {
       });
 
     if (correctLink == false) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Please Provide correct url!!" });
+      return res.status(400).send({ status: false, message: "Please Provide correct url!!" });
     }
-
-    let urlCheck = await urlModel
-      .findOne({ longUrl: urlCreate.longUrl })
+    let urlCheck = await urlModel.findOne({ longUrl: urlCreate.longUrl })
       .select({ _id: 0, longUrl: 1, shortUrl: 1, urlCode: 1 });
     //Getting data from caching server
     let cacheProfileData = await GET_ASYNC(`${urlCreate.longUrl}`);
@@ -66,16 +55,14 @@ const createUrl = async function (req, res) {
         longUrl: data.longUrl,
         urlCode: data.urlCode,
       };
-      return res.status(400).send({
-        status: false,
+      return res.status(400).send({status: false,
         msg: "shortUrl for this longUrl has already been generated response form caching server",
         data: obj,
       });
     }
     //The code between 60- 75 lines used to get data from caching server
     if (urlCheck) {
-      return res.status(400).send({
-        status: false,
+      return res.status(400).send({status: false,
         msg: "shortUrl for this longUrl has already been generated response from mongo db",
         data: urlCheck,
       });
